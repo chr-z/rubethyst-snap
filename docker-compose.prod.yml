@@ -1,0 +1,99 @@
+x-snap-base: &snap-base
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: rubethyst-snap:latest
+  env_file:
+    - .env
+  restart: unless-stopped
+  depends_on:
+    redis:
+      condition: service_healthy
+
+services:
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:2.10-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - CADDY_INGRESS_NETWORKS=snap_edge
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - edge
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--dir", "/data"]
+    volumes:
+      - ./redis_data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  api:
+    <<: *snap-base
+    command: ["rubethyst-snap-api"]
+    volumes:
+      - downloads:/data/downloads:ro
+    networks:
+      - edge
+      - internal
+    labels:
+      caddy: api.rubethystlab.com
+      caddy.reverse_proxy: "{{upstreams 8000}}"
+      caddy.encode: "zstd gzip"
+      caddy.header.Strict-Transport-Security: "\"max-age=31536000; includeSubDomains\""
+
+  worker:
+    <<: *snap-base
+    command: ["rubethyst-snap-worker"]
+    volumes:
+      - downloads:/data/downloads
+    networks:
+      - internal
+
+  beat:
+    <<: *snap-base
+    command: ["rubethyst-snap-beat"]
+    volumes:
+      - downloads:/data/downloads
+    networks:
+      - internal
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-https://api.rubethystlab.com}
+    image: rubethyst-snap-frontend:latest
+    restart: unless-stopped
+    networks:
+      - edge
+    labels:
+      caddy: app.rubethystlab.com
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+      caddy.encode: "zstd gzip"
+      caddy.header.Strict-Transport-Security: "\"max-age=31536000; includeSubDomains\""
+
+volumes:
+  downloads:
+  caddy_data:
+  caddy_config:
+
+networks:
+  edge:
+    name: snap_edge
+  internal:
+    name: snap_internal
+    internal: true

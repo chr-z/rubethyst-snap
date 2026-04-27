@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rubethyst-snap"
+version = "0.1.0"
+description = "Rubethyst Snap: motor multi-plataforma de download de vídeo (Rubethyst Lab)."
+readme = "README.md"
+license = { file = "LICENSE.txt" }
+requires-python = ">=3.11"
+authors = [{ name = "Rubethyst Lab" }]
+keywords = ["yt-dlp", "video", "download", "saas", "ffmpeg", "celery", "fastapi"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "yt-dlp>=2025.1.15",
+    "ffmpeg-python>=0.2.0",
+]
+
+[project.optional-dependencies]
+api = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "redis[hiredis]>=5.2",
+    "celery[redis]>=5.4",
+    "PyJWT>=2.9",
+    "sse-starlette>=2.1",
+    "anyio>=4.4",
+]
+desktop = []
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27",
+    "ruff>=0.7",
+]
+
+[project.scripts]
+rubethyst-snap = "rubethyst_snap.desktop.app:main"
+rubethyst-snap-api = "rubethyst_snap.api.main:run"
+rubethyst-snap-worker = "rubethyst_snap.worker.main:run_worker"
+rubethyst-snap-beat = "rubethyst_snap.worker.main:run_beat"
+
+[project.urls]
+Homepage = "https://rubethystlab.com"
+
+[tool.setuptools.packages.find]
+include = ["rubethyst_snap*"]
+exclude = ["tests*", "scripts*", "infra*", "docs*", "*.egg-info*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
