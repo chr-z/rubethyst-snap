@@ -184,3 +184,10 @@ Ferramenta de ingestão de mídia: use apenas com conteúdo que você tem direit
 baixar — seus próprios arquivos, acervos licenciados, material de domínio público
 ou com autorização do titular. O projeto não contorna DRM nem autenticação, e quem
 opera a instância responde pelo uso.
+
+## Licença
+
+**AGPL-3.0-or-later.** O código é público: use, estude, modifique e auto-hospede
+livremente. A condição da AGPL é uma só — se você oferecer este software como
+serviço pela rede, precisa publicar as modificações que fizer. O autor mantém a
+opção de licenciar comercialmente sob outros termos (christian@chr-z.dev).
