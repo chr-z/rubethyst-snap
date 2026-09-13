@@ -177,3 +177,10 @@ Este projeto é um motor técnico. Operá-lo como serviço pago envolve
 responsabilidade legal sobre direito autoral, termos das plataformas
 de origem e proteção de dados. Leia [docs/STRATEGY.md](docs/STRATEGY.md)
 **antes** de habilitar cobrança.
+
+## Uso responsável
+
+Ferramenta de ingestão de mídia: use apenas com conteúdo que você tem direito de
+baixar — seus próprios arquivos, acervos licenciados, material de domínio público
+ou com autorização do titular. O projeto não contorna DRM nem autenticação, e quem
+opera a instância responde pelo uso.
